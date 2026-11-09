@@ -1,271 +1,345 @@
-import os
-
 import joblib
 import pandas as pd
 import streamlit as st
 
-
-@st.cache_resource
-def load_model():
-    if not os.path.exists("wine_model.pkl"):
-        st.error("Model not found. Run `python train_model.py` before launching the app.")
-        st.stop()
-    return joblib.load("wine_model.pkl")
-
-
-@st.cache_data
-def load_dataset():
-    if not os.path.exists("wine_quality.csv"):
-        st.error("Dataset not found. Run `python train_model.py` before launching the app.")
-        st.stop()
-    return pd.read_csv("wine_quality.csv")
-
-
-st.set_page_config(page_title="Wine Quality Predictor", page_icon="🍷", layout="wide")
+st.set_page_config(
+    page_title="Wine Quality Predictor",
+    page_icon="🍷",
+    layout="wide"
+)
 
 st.markdown(
     """
     <style>
-        .stApp {
-            background: linear-gradient(180deg, #fffaf2 0%, #f5efe7 100%);
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        html, body, [data-testid="stAppViewContainer"] {
+            background:
+                radial-gradient(ellipse at 8% 8%, rgba(190, 24, 93, 0.13), transparent 34%),
+                radial-gradient(ellipse at 92% 18%, rgba(127, 29, 29, 0.12), transparent 32%),
+                linear-gradient(135deg, #fff8f4 0%, #f8e9e9 48%, #fdf3e8 100%);
+            color: #1f2937;
+            font-family: 'Inter', sans-serif;
         }
-        .main-header {
-            background: linear-gradient(135deg, #7d1d1d, #af3d27);
-            padding: 1.5rem 1.5rem 1.2rem 1.5rem;
-            border-radius: 1rem;
-            color: white;
-            box-shadow: 0 8px 24px rgba(125, 29, 29, 0.18);
+
+        .hero {
+            background: linear-gradient(135deg, rgba(127, 29, 29, 0.96), rgba(190, 24, 93, 0.85));
+            border-radius: 22px;
+            padding: 1.5rem 1.75rem;
+            box-shadow: 0 18px 38px rgba(127, 29, 29, 0.16);
             margin-bottom: 1rem;
         }
-        .splash-card {
-            max-width: 850px;
-            margin: 8vh auto 1.5rem auto;
-            padding: clamp(2rem, 6vw, 4.5rem);
-            border: 1px solid rgba(125, 29, 29, 0.14);
-            border-radius: 1.5rem;
-            background:
-                radial-gradient(ellipse at 90% 10%, rgba(176, 75, 53, 0.17), transparent 34%),
-                linear-gradient(140deg, #fffdf9, #f5e8dc);
-            box-shadow: 0 18px 50px rgba(75, 38, 29, 0.12);
-            text-align: center;
+
+        .hero h1 {
+            color: #fff;
+            margin: 0;
+            font-size: 2.3rem;
+            font-weight: 800;
         }
-        .splash-kicker {
-            color: #8a4334;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
+
+        .hero p {
+            color: rgba(255,255,255,0.85);
+            margin: 0.45rem 0 0;
+            font-size: 1rem;
         }
-        .splash-title {
-            margin: 0.75rem 0 0.5rem;
-            color: #48201f;
-            font-size: clamp(2.2rem, 6vw, 3.8rem);
-            line-height: 1.08;
+
+        .tag-row {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
         }
-        .splash-copy {
-            max-width: 600px;
-            margin: 0 auto;
-            color: #705d56;
-            font-size: 1.08rem;
-            line-height: 1.7;
-        }
-        .splash-note {
-            max-width: 620px;
-            margin: 1.5rem auto 0;
-            padding: 0.8rem 1rem;
-            border-radius: 0.75rem;
-            background: rgba(255, 255, 255, 0.7);
-            color: #76534b;
-            font-size: 0.85rem;
-        }
-        div[data-testid="stButton"] > button[kind="primary"] {
-            width: 100%;
-            border: 0;
-            border-radius: 0.75rem;
-            background: #7d1d1d;
-            color: white;
-            font-weight: 700;
-            padding: 0.65rem 1.5rem;
-        }
-        div[data-testid="stButton"] > button[kind="primary"]:hover {
-            background: #5e171b;
-            border: 0;
-            color: white;
-        }
-        .glass-panel {
-            background: rgba(255,255,255,0.75);
-            border: 1px solid rgba(123, 74, 55, 0.12);
-            border-radius: 1rem;
-            padding: 1rem;
-            box-shadow: 0 4px 14px rgba(52, 26, 19, 0.08);
-        }
-        .section-label {
-            color: #7d1d1d;
-            font-size: 0.8rem;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-        }
-        .quality-badge {
-            display: inline-block;
-            padding: 0.4rem 0.8rem;
+
+        .tag {
+            background: rgba(255,255,255,0.14);
+            border: 1px solid rgba(255,255,255,0.18);
+            color: #fff;
             border-radius: 999px;
-            font-weight: 700;
-            background: #f5e4d9;
-            color: #7d1d1d;
-        }
-        .sidebar-card {
-            padding: 1rem;
-            border: 1px solid rgba(125, 29, 29, 0.14);
-            border-radius: 0.9rem;
-            background: linear-gradient(160deg, #fffaf5, #f8eee8);
-        }
-        .sidebar-eyebrow {
-            color: #8a4334;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-        }
-        .sidebar-rule {
-            margin: 0.8rem 0;
-            padding: 0.75rem;
-            border-radius: 0.65rem;
-            background: #fff;
-            border-left: 3px solid #8a2432;
-        }
-        .sidebar-rule strong {
-            display: block;
-            color: #70202a;
-            font-size: 0.9rem;
-        }
-        .sidebar-rule span {
-            color: #65504a;
+            padding: 0.35rem 0.75rem;
             font-size: 0.8rem;
+            font-weight: 600;
         }
-        div[data-testid="stMetricValue"] {
-            font-size: 1.8rem;
+
+        .metric-card {
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 18px;
+            padding: 1rem 1.1rem;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+            height: 100%;
+        }
+
+        .metric-label {
+            color: #64748b;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.4rem;
             font-weight: 700;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.1;
+        }
+
+        .panel {
+            background: rgba(255,255,255,0.72);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 20px;
+            padding: 1rem 1.1rem;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+            margin-top: 1rem;
+        }
+
+        .section-title {
+            color: #111827;
+            font-weight: 800;
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .status-box {
+            background: linear-gradient(135deg, #eefdf5, #dcfce7);
+            border: 1px solid rgba(34, 197, 94, 0.25);
+            border-radius: 14px;
+            padding: 0.8rem 1rem;
+            color: #166534;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fff7ed, #ffedd5);
+            border: 1px solid rgba(251, 146, 60, 0.3);
+            border-radius: 14px;
+            padding: 0.8rem 1rem;
+            color: #9a4d00;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+        }
+
+        [data-testid="stFileUploader"] > section {
+            background: rgba(255,255,255,0.8);
+            border: 1px dashed rgba(147, 51, 234, 0.5);
+            border-radius: 16px;
+        }
+
+        [data-testid="stRadio"] > div {
+            gap: 0.65rem;
+        }
+
+        [data-testid="stRadio"] label {
+            background: rgba(255,255,255,0.82);
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            border-radius: 14px;
+            padding: 0.8rem 1rem;
+            min-height: 3.2rem;
+            box-shadow: 0 5px 14px rgba(15, 23, 42, 0.06);
+            transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+        }
+
+        [data-testid="stRadio"] label:hover {
+            transform: translateY(-2px);
+            border-color: rgba(124, 58, 237, 0.55);
+            box-shadow: 0 9px 20px rgba(124, 58, 237, 0.12);
+        }
+
+        [data-testid="stRadio"] label p {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        [data-testid="stRadio"] label:has(input:checked) {
+            background: linear-gradient(135deg, #7c3aed, #ec4899);
+            border-color: transparent;
+        }
+
+        [data-testid="stRadio"] label:has(input:checked) p {
+            color: #fff;
+        }
+
+        .stDownloadButton > button, .stButton > button {
+            width: 100%;
+            min-height: 3.25rem;
+            background: linear-gradient(135deg, #7c3aed, #ec4899);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 800;
+            padding: 0.8rem 1.2rem;
+            box-shadow: 0 8px 18px rgba(124, 58, 237, 0.2);
+            transition: transform 160ms ease, box-shadow 160ms ease;
+        }
+
+        .stDownloadButton > button:hover, .stButton > button:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(124, 58, 237, 0.3);
+        }
+
+        .footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.85rem;
+            padding: 2rem 0 0.5rem;
+            letter-spacing: 0.03em;
         }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-if "show_dashboard" not in st.session_state:
-    st.session_state.show_dashboard = False
 
-if not st.session_state.show_dashboard:
-    st.markdown(
-        """
-        <div class="splash-card">
-            <div style="font-size:3rem; margin-bottom:0.5rem;">🍷</div>
-            <div class="splash-kicker">Red wine · Quality screening</div>
-            <h1 class="splash-title">A clearer look at wine quality</h1>
-            <p class="splash-copy">
-                Review physicochemical measurements and get a preliminary quality
-                classification for your wine samples.
-            </p>
-            <div class="splash-note">
-                A decision-support prototype — not a replacement for laboratory,
-                sensory, or food-safety testing.
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    _, button_column, _ = st.columns([1, 1, 1])
-    with button_column:
-        if st.button("Open", type="primary", use_container_width=True):
-            st.session_state.show_dashboard = True
-            st.rerun()
-    st.stop()
+@st.cache_resource
+def load_model():
+    return joblib.load("wine_model.pkl")
+
+
+@st.cache_data
+def load_dataset():
+    return pd.read_csv("wine_quality.csv")
+
 
 model = load_model()
 data = load_dataset()
 
 st.markdown(
     """
-    <div class="main-header">
-        <h1 style="margin:0; font-size:2.5rem;">🍷 Wine Quality Predictor</h1>
-        <p style="margin:0.5rem 0 0 0; font-size:1rem; opacity:0.9;">Preliminary screening for red wine batches based on physicochemical composition</p>
+    <div class="hero">
+        <h1>🍷 Wine Quality Prediction System</h1>
+        <div class="tag-row">
+            <span class="tag">Random Forest</span>
+            <span class="tag">Red Wine Dataset</span>
+            <span class="tag">CSV Prediction Flow</span>
+        </div>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-st.sidebar.markdown(
-    """
-    <div class="sidebar-card">
-        <div class="sidebar-eyebrow">🍷 How it works</div>
-        <p style="margin:0.35rem 0 0.2rem; font-size:1.15rem; font-weight:700; color:#39231f;">
-            Wine quality check
-        </p>
-        <p style="margin:0; color:#76645e; font-size:0.83rem;">
-            A Random Forest model reviews the wine’s chemical measurements.
-        </p>
-        <div class="sidebar-rule">
-            <strong>Quality score ≥ 6</strong>
-            <span>GOOD QUALITY</span>
+c1, c2, c3 = st.columns(3)
+with c1:
+    st.markdown(
+        """
+        <div class="metric-card">
+            <div class="metric-label">Records</div>
+            <div class="metric-value">{}</div>
         </div>
-        <div class="sidebar-rule">
-            <strong>Quality score &lt; 6</strong>
-            <span>NEEDS IMPROVEMENT</span>
+        """.format(len(data)),
+        unsafe_allow_html=True,
+    )
+with c2:
+    st.markdown(
+        """
+        <div class="metric-card">
+            <div class="metric-label">Avg. Quality</div>
+            <div class="metric-value">{}</div>
         </div>
-        <p style="margin:0.65rem 0 0; color:#76645e; font-size:0.78rem;">
-            Preliminary screening only — confirm results with professional testing.
-        </p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+        """.format(round(data["quality"].mean(), 2)),
+        unsafe_allow_html=True,
+    )
+with c3:
+    st.markdown(
+        """
+        <div class="metric-card">
+            <div class="metric-label">Good Quality</div>
+            <div class="metric-value">{}</div>
+        </div>
+        """.format(int((data["quality"] >= 6).sum())),
+        unsafe_allow_html=True,
+    )
 
-col1, col2, col3 = st.columns(3)
-col1.metric("Total records", len(data))
-col2.metric("Average quality", round(data["quality"].mean(), 2))
-col3.metric("Good-quality batches", int((data["quality"] >= 6).sum()))
+page = st.sidebar.radio("Navigation", ["Dashboard", "Upload & Download"])
 
-st.markdown('<div class="section-label">Dataset overview</div>', unsafe_allow_html=True)
-with st.container():
+if page == "Dashboard":
+    st.markdown('<div class="section-title">Dataset preview</div>', unsafe_allow_html=True)
     st.dataframe(data.head(10), use_container_width=True)
+    st.caption(
+        "Use the Upload & Download page in the sidebar to submit wine measurements "
+        "and download prediction results."
+    )
+else:
+    st.markdown('<div class="panel">', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="section-title">Upload & Download Predictions</div>',
+        unsafe_allow_html=True,
+    )
+    st.write(
+        "Download a sample CSV template, or upload a CSV containing the wine "
+        "measurement columns used by the model."
+    )
 
-st.markdown('<div class="section-label">Prediction upload</div>', unsafe_allow_html=True)
-st.write("Upload a CSV with the same predictor columns used during training.")
+    template = data.drop(columns=["quality"]).head(5)
+    st.download_button(
+        "Download sample input CSV",
+        template.to_csv(index=False),
+        "sample_wine_input.csv",
+        "text/csv",
+    )
 
-sample_template = data.drop(columns=["quality"]).head(5)
-st.download_button(
-    label="Download sample input CSV",
-    data=sample_template.to_csv(index=False),
-    file_name="sample_wine_input.csv",
-    mime="text/csv",
+    uploaded = st.file_uploader("Choose wine sample CSV", type=["csv"])
+    if uploaded is not None:
+        try:
+            new_data = pd.read_csv(uploaded)
+        except (pd.errors.EmptyDataError, pd.errors.ParserError, UnicodeDecodeError) as error:
+            st.error("The uploaded file could not be read as a valid CSV. Please check the file and try again.")
+        else:
+            required_columns = list(model.feature_names_in_)
+            missing = [
+                column for column in required_columns
+                if column not in new_data.columns
+            ]
+
+            if missing:
+                st.markdown(
+                    "<div class='warning-box'>Missing required columns: {} </div>".format(
+                        ", ".join(missing)
+                    ),
+                    unsafe_allow_html=True,
+                )
+                st.error(
+                    "Please upload a file that includes all required wine measurements."
+                )
+            elif new_data.empty:
+                st.error("The uploaded CSV contains no data rows.")
+            else:
+                predictions = model.predict(new_data[required_columns])
+                results = new_data.copy()
+                results["Prediction"] = [
+                    "GOOD QUALITY" if value == 1 else "NEEDS IMPROVEMENT"
+                    for value in predictions
+                ]
+
+                good_count = int((predictions == 1).sum())
+                st.markdown(
+                    "<div class='status-box'>Prediction summary: {} good-quality "
+                    "samples out of {} reviewed.</div>".format(
+                        good_count, len(results)
+                    ),
+                    unsafe_allow_html=True,
+                )
+
+                st.markdown(
+                    '<div class="section-title">Prediction results</div>',
+                    unsafe_allow_html=True,
+                )
+                st.dataframe(results, use_container_width=True)
+                st.metric("Predicted good-quality samples", good_count)
+                st.download_button(
+                    "Download prediction results",
+                    results.to_csv(index=False),
+                    "wine_quality_predictions.csv",
+                    "text/csv",
+                )
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown(
+    '<div class="footer">Wine Quality Prediction System™ · @Angel Faith Gomez</div>',
+    unsafe_allow_html=True,
 )
-
-uploaded = st.file_uploader("Choose wine sample CSV", type=["csv"])
-
-if uploaded is not None:
-    new_data = pd.read_csv(uploaded)
-    required_columns = list(model.feature_names_in_)
-    missing = [column for column in required_columns if column not in new_data.columns]
-
-    if missing:
-        st.error("Missing required columns: " + ", ".join(missing))
-    else:
-        predictions = model.predict(new_data[required_columns])
-        results = new_data.copy()
-        results["Prediction"] = [
-            "GOOD QUALITY" if value == 1 else "NEEDS IMPROVEMENT"
-            for value in predictions
-        ]
-
-        st.markdown('<div class="section-label">Prediction results</div>', unsafe_allow_html=True)
-        st.dataframe(results, use_container_width=True)
-
-        good_count = int((predictions == 1).sum())
-        st.metric("Predicted good-quality samples", good_count)
-
-        st.download_button(
-            label="Download prediction results",
-            data=results.to_csv(index=False),
-            file_name="wine_quality_predictions.csv",
-            mime="text/csv",
-        )
