@@ -1,50 +1,59 @@
 # Wine Quality Prediction System
 
-This project is a classroom prototype that predicts whether a red wine sample is likely to be `GOOD QUALITY` or `NEEDS IMPROVEMENT` based on its physicochemical measurements.
-
 ## Problem
-A small wine-production business needs a simple preliminary screening tool to review batches before further laboratory or sensory testing.
+A small wine-production business needs a quick preliminary screening aid to decide whether a wine sample appears to be of good quality or if it needs further improvement before more detailed testing.
 
 ## Dataset
-The model is trained on the UCI Wine Quality dataset for red wine. The original target is the wine quality score, which is converted into a binary label:
-
-- `quality >= 6` -> `GOOD QUALITY`
-- `quality < 6` -> `NEEDS IMPROVEMENT`
-
-Source: https://archive.ics.uci.edu/dataset/186/wine+quality
+This prototype uses the UCI Wine Quality dataset for red wine. The original dataset is available at:
+https://archive.ics.uci.edu/dataset/186/wine+quality
 
 ## Prediction rule
-The model uses the physicochemical attributes as input features, but the original `quality` score is excluded from the predictor list to avoid target leakage.
+The model classifies a wine sample as:
+- GOOD QUALITY when quality >= 6
+- NEEDS IMPROVEMENT when quality < 6
 
-## Technologies used
+The original quality score is used only to generate the target label and is excluded from the model input features.
+
+## Technologies
 - Python 3.10+
 - pandas
 - scikit-learn
 - Streamlit
 - joblib
 
-## Project files
-- `train_model.py` retrieves the dataset, trains the model, evaluates it, and saves `wine_model.pkl`
-- `app.py` builds the Streamlit dashboard and prediction interface
-- `requirements.txt` lists the required Python packages
+## Project structure
+- `train_model.py` — downloads the dataset, prepares the target, trains the Random Forest model, and saves `wine_model.pkl`
+- `app.py` — Streamlit dashboard for uploading CSV inputs and displaying predictions
+- `requirements.txt` — Python dependencies
+- `wine_quality.csv` — downloaded red-wine dataset
+- `wine_model.pkl` — trained model artifact
 
-## Installation
-```bash
-pip install -r requirements.txt
-```
+## Setup
+1. Create a virtual environment (optional but recommended).
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Train the model:
+   ```bash
+   python train_model.py
+   ```
+4. Run the app:
+   ```bash
+   streamlit run app.py
+   ```
 
-## Run the model trainer
-```bash
-python train_model.py
-```
+## Usage
+- Open the local Streamlit URL shown in the terminal.
+- Select **Open** on the welcome screen to enter the predictor dashboard.
+- Download the sample input CSV from the app.
+- Upload a CSV file containing the same chemical measurements used during model training.
+- Review the quality prediction and download the results file.
 
-## Run the app
-```bash
-streamlit run app.py
-```
-
-## Responsible use
-This is a classroom prototype based on a public dataset. It is not a substitute for laboratory testing, sensory evaluation, food-safety procedures, or professional quality-control decisions.
+## Deploy on Streamlit Community Cloud
+1. Sign in at [Streamlit Community Cloud](https://share.streamlit.io/) with the GitHub account that can access this repository.
+2. Select **Create app** and choose `fesbokdot11-netizen/wine-quality-prediction`, branch `main`, and `app.py`.
+3. Deploy the app. The trained model and dataset are included in the repository, so no secrets or additional configuration are required.
 
 ## Limitations
-The model is trained on one specific red-wine dataset and may not generalize perfectly to other producers, regions, or testing conditions.
+This is a classroom prototype based on a public red-wine dataset. It is intended for preliminary screening only and should not replace formal laboratory, sensory, or food-safety testing. The model may not generalize well to other producers, regions, or grape varieties.
