@@ -294,6 +294,16 @@ Answer briefly:
 4. Why should the prediction be treated as a preliminary screening result rather than a final quality decision?
 5. What additional data or testing would help improve the reliability of the system?
 
+### Project reflection
+
+This project demonstrated how a data-mining workflow can be turned into a small, usable information-system prototype. We retrieved and inspected the UCI red-wine dataset, removed duplicate rows for model training, and transformed the quality score into two categories: GOOD QUALITY for scores of 6 or higher and NEEDS IMPROVEMENT for scores below 6. The original quality score was excluded from the model inputs because it defines the target; including it would cause target leakage and make the evaluation misleading.
+
+The Random Forest pipeline reports accuracy, a confusion matrix, and precision, recall, and F1-score for both classes. Looking at recall for GOOD QUALITY helps show how many truly good-quality examples are identified. Low recall could result in acceptable samples being flagged for improvement, while other classification errors could also affect screening decisions. For this reason, accuracy alone is not enough to judge whether the model is useful.
+
+The Streamlit app connects the trained model to a CSV workflow: users can download an input template, upload measurements, review predictions, and download the results. Separating this workflow from the overview dashboard makes the two main tasks easier to find. Building and testing the app also highlighted that uploaded data needs the required measurement columns and that clear error messages are important when a file is incomplete or unreadable.
+
+The model is limited by the dataset it learned from. Differences in producers, regions, grape varieties, equipment, and measurement practices may affect its performance on new samples. The predictions should therefore be treated only as preliminary screening results, not as a substitute for laboratory tests, sensory evaluation, food-safety procedures, or professional decisions. To improve confidence, the system should be tested on independent and more diverse samples, and its performance and error trade-offs should be reviewed with quality-control professionals.
+
 ## 11. Submission checklist
 
 - ☐ SAD mini-analysis (problem, user, inputs, process, outputs, limitation)
