@@ -1,0 +1,10 @@
+[server]
+enableStaticServing = true
+
+[theme]
+base = "dark"
+primaryColor = "#b85d6b"
+backgroundColor = "#1a0b0e"
+secondaryBackgroundColor = "#341319"
+textColor = "#fff4f1"
+font = "sans serif"
